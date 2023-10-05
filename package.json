@@ -1,0 +1,67 @@
+{
+  "name": "kyoto-harvard-transliteration",
+  "displayName": "Kyoto Harvard Transliteration",
+  "description": "Kyoto Harvard Transliteration for Code",
+  "version": "0.0.1",
+  "publisher": "eadaradhiraj",
+  "author": "Dhiraj Eadara",
+  "engines": {
+    "vscode": "^1.64.0"
+  },
+  "categories": [
+    "Formatters",
+    "Other",
+    "Language Packs"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eadaradhiraj/kyoto-harvard-transliteration"
+  },
+  "main": "src/extension",
+  "browser": "dist/web/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.kyotoHarvardTransliteration",
+        "title": "Toggle Kyoto Harvard Transliteration"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "extension.kyotoHarvardTransliteration",
+        "key": "ctrl+shift+i",
+        "mac": "cmd+shift+i",
+        "when": "editorTextFocus"
+      }
+    ],
+    "configuration": {
+      "title": "Kyoto Harvard Transliteration"
+    },
+    "menus": {
+      "touchBar": [
+        {
+          "command": "extension.kyotoHarvardTransliteration",
+          "when": "editorHasCompletionItemProvider && editorTextFocus && !editorReadonly",
+          "group": "koyo-harvard-transliteration-group"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "pretest": "npm run compile-web",
+    "vscode:prepublish": "npm run package-web",
+    "lint": "eslint src",
+    "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ."
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.15",
+    "@types/vscode": "^1.64.0",
+    "eslint": "^8.8.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4",
+    "@vscode/test-web": "^0.0.29"
+  }
+}
