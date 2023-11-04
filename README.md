@@ -27,4 +27,4 @@ For example:
 
 ## Known Issues
 
-None
+The suggestions don't appear. So the app is practically useless as it stands now
