@@ -1,156 +1,152 @@
 const vscode = require('vscode'); // eslint-disable-line
 
-function replaceAll(retStr, charObj) {
-  let changedStr = retStr;
-  Object.keys(charObj).forEach((key) => {
-    changedStr = changedStr.replace(new RegExp(charObj[key], 'g'), charObj[key]);
-  });
-  return changedStr;
-}
+class HkAndSkt {
+  static HK_CONSONANTS_DICT = {
+      "k": "क",
+      "g": "ग",
+      "G": "ङ",
+      "c": "च",
+      "ch": "छ",
+      "j": "ज",
+      "jh": "झ",
+      "J": "ञ",
+      "th": "थ",
+      "dh": "ध",
+      "T": "ट",
+      "Th": "ठ",
+      "D": "ड",
+      "Dh": 'ढ',
+      "N": "ण",
+      "t": "त",
+      "d": "द",
+      "n": "न",
+      "p": "प",
+      "b": "ब",
+      "bh": "भ",
+      "ph": "फ",
+      "m": "म",
+      "y": "य",
+      "r": "र",
+      "l": "ल",
+      "v": "व",
+      "z": "श",
+      "S": "ष",
+      "s": "स",
+      "h": "ह",
+  };
 
-const consonantsDictDev = {
-  k: 'क',
-  K: 'ख',
-  g: 'ग',
-  Q: 'घ',
-  G: 'ङ',
-  c: 'च',
-  C: 'छ',
-  j: 'ज',
-  Z: 'झ',
-  J: 'ञ',
-  T: 'ट',
-  V: 'ठ',
-  D: 'ड',
-  X: 'ढ',
-  N: 'ण',
-  t: 'त',
-  Y: 'थ',
-  d: 'द',
-  F: 'ध',
-  n: 'न',
-  p: 'प',
-  P: 'फ',
-  b: 'ब',
-  B: 'भ',
-  m: 'म',
-  y: 'य',
-  r: 'र',
-  l: 'ल',
-  v: 'व',
-  z: 'श',
-  S: 'ष',
-  s: 'स',
-  h: 'ह'
-};
+  static HK_VOWEL_MARKER_DICT = {
+      'a': '',
+      'A': 'ा',
+      'i': 'ि',
+      'I': 'ी',
+      'u': 'ु',
+      'U': 'ू',
+      'R': 'ृ',
+      'e': 'े',
+      'o': 'ो',
+      "RR": "ॄ",
+  };
 
-const mahapranasDictDev = {
-  ai: 'E',
-  au: 'O',
-  RR: 'L',
-  kh: 'K',
-  gh: 'Q',
-  ch: 'C',
-  jh: 'Z',
-  Th: 'V',
-  Dh: 'X',
-  th: 'Y',
-  dh: 'F',
-  pha: 'P',
-  bh: 'B'
-};
+  static HK_NASAL_DICT = {
+      "H": "ः",
+      "M": "ं"
+  };
 
-const vowelsMarkersDictDev = {
-  a: '',
-  A: 'ा',
-  i: 'ि',
-  I: 'ी',
-  u: 'ु',
-  U: 'ू',
-  R: 'ृ',
-  L: 'ॄ',
-  e: 'े',
-  E: 'ै',
-  o: 'ो',
-  O: 'ौ'
-};
+  static HK_VOWELS_DICT = {
+      "a": "अ",
+      "A": "आ",
+      "i": "इ",
+      "I": "ई",
+      "u": "उ",
+      "U": "ऊ",
+      "R": "ऋ",
+      "RR": "ॠ",
+      "e": "ए",
+      "ai": "ऐ",
+      "o": "ओ",
+      "au": "औ"
+  };
 
-const actualVowelsDictDev = {
-  a: 'अ',
-  A: 'आ',
-  i: 'इ',
-  I: 'ई',
-  u: 'उ',
-  U: 'ऊ',
-  R: 'ऋ',
-  L: 'ॠ',
-  e: 'ए',
-  E: 'ऐ',
-  o: 'ओ',
-  O: 'औ'
-};
+  static REM_CHAR_DICT = {
+      ...HkAndSkt.HK_NASAL_DICT,
+      ...{"|": "।", "\'": "ऽ"}
+  };
 
-const specialVowelsDictDev = {
-  M: 'ं',
-  H: 'ः'
-};
-const spacePeriodDev = [' ', '.'];
+  static hk_to_skt(text) {
+      const textLen = text.length;
+      let res = [];
+      let idx = 0;
 
-const consonantDevArr = Object.keys(consonantsDictDev);
-const vowelsMarkersDevArr = Object.keys(vowelsMarkersDictDev);
-const specialVowelsDevArr = Object.keys(specialVowelsDictDev);
-const actualVowelsDevArr = Object.keys(actualVowelsDictDev);
+      while (idx < textLen) {
+          const ch = text[idx];
+          let prevCh = null;
+          let nxtCh = null;
 
-function kh2dev(orig) {
-  let transstr = '';
-  const st = replaceAll(orig, mahapranasDictDev);
-  const fch = st.charAt('0');
-  let stringIndex = 0;
-  if (actualVowelsDevArr.includes(fch)) {
-    // if starting character is a vowel
-    transstr = actualVowelsDictDev[fch];
-    stringIndex = 1;
-  }
-  for (let i = stringIndex; i < st.length; i += 1) {
-    const ch = st.charAt(i);
-    const nch = st.charAt(i + 1);
-    const pch = st.charAt(i - 1);
-    if (actualVowelsDevArr.includes(ch) && (
-      // if current letter is a vowel but previous is also a vowel or a psace
-      actualVowelsDevArr.includes(pch)
-      || specialVowelsDevArr.includes(pch)
-      || spacePeriodDev.includes(pch)
-    )) {
-      transstr += actualVowelsDictDev[ch];
-    } else if (specialVowelsDevArr.includes(ch)) {
-      // if current letter is a visarga or anunAsika
-      transstr += specialVowelsDictDev[ch];
-      if (actualVowelsDevArr.includes(nch)) {
-        transstr += actualVowelsDictDev[nch];
-        i += 1;
+          if (idx + 1 < textLen) {
+              nxtCh = text[idx + 1];
+          }
+
+          if (idx > 0) {
+              prevCh = text[idx - 1];
+          }
+
+          if (["k", "g", "c", "j", "t", "d", "T", "D", "p", "b"].includes(ch)) {
+              if (HkAndSkt.HK_CONSONANTS_DICT.hasOwnProperty(prevCh)) {
+                  res.push('्');
+              }
+
+              if (nxtCh === "h") {
+                  res.push(HkAndSkt.HK_CONSONANTS_DICT[ch + nxtCh]);
+                  idx += 1;
+              } else {
+                  res.push(HkAndSkt.HK_CONSONANTS_DICT[ch]);
+              }
+          } else if (HkAndSkt.HK_CONSONANTS_DICT.hasOwnProperty(ch)) {
+              if (prevCh && HkAndSkt.HK_CONSONANTS_DICT.hasOwnProperty(prevCh)) {
+                  res.push('्');
+              }
+
+              res.push(HkAndSkt.HK_CONSONANTS_DICT[ch]);
+          } else if (HkAndSkt.HK_VOWELS_DICT.hasOwnProperty(ch)) {
+              if (HkAndSkt.HK_CONSONANTS_DICT.hasOwnProperty(prevCh)) {
+                  if ((ch === "a" && ["i", "u"].includes(nxtCh)) || (ch === "R" && nxtCh === "R")) {
+                      res.push(HkAndSkt.HK_VOWEL_MARKER_DICT[ch + nxtCh]);
+                      idx += 1;
+                  } else {
+                      res.push(HkAndSkt.HK_VOWEL_MARKER_DICT[ch]);
+                  }
+              } else if (!HkAndSkt.HK_CONSONANTS_DICT.hasOwnProperty(prevCh)) {
+                  if ((ch === "a" && ["i", "u"].includes(nxtCh)) || (ch === "R" && nxtCh === "R")) {
+                      res.push(HkAndSkt.HK_VOWELS_DICT[ch + nxtCh]);
+                      idx += 1;
+                  } else {
+                      res.push(HkAndSkt.HK_VOWELS_DICT[ch]);
+                  }
+              }
+          } else if (HkAndSkt.REM_CHAR_DICT.hasOwnProperty(ch)) {
+              if (prevCh && HkAndSkt.HK_CONSONANTS_DICT.hasOwnProperty(prevCh)) {
+                  res.push('्');
+              }
+
+              res.push(HkAndSkt.REM_CHAR_DICT[ch]);
+          } else {
+              if (prevCh && HkAndSkt.HK_CONSONANTS_DICT.hasOwnProperty(prevCh)) {
+                  res.push('्');
+              }
+
+              res.push(ch);
+          }
+
+          idx += 1;
       }
-    } else if
-    // if consonant is followed by a consonant or end of string
-    (consonantDevArr.includes(ch)
-      && (consonantDevArr.includes(nch)
-      || i === st.length - 1
-      || spacePeriodDev.includes(nch)
-      )) {
-      transstr += `${consonantsDictDev[ch]}्`;
-    } else if (consonantDevArr.includes(ch)
-      && vowelsMarkersDevArr.includes(nch)) {
-      // if consonant followed by a vowel
-      transstr += consonantsDictDev[ch] + vowelsMarkersDictDev[nch];
-      i += 1;
-    } else if (ch === '\'') {
-      transstr += 'ऽ';
-    } else if (ch === '.') {
-      transstr += '।';
-    } else {
-      transstr += ch;
-    }
+
+      if (HkAndSkt.HK_CONSONANTS_DICT.hasOwnProperty(text[textLen - 1])) {
+          res.push('्');
+      }
+
+      return res.join('');
   }
-  return transstr;
 }
 
 const getSearchText = (lineText, position) => {
@@ -169,19 +165,15 @@ class InputAutoCompletionProvider {
   provideCompletionItems(document, position) {
     const lineAt = document.lineAt(position);
     const lineText = document.getText(lineAt.range);
-
     const searchText = getSearchText(lineText, position);
-
-    const items = [];
-    // console.log('lineAt', lineAt);
-    // console.log('lineText', lineText);
     // Add the actual typed text to suggestions list
-    const item = new vscode.CompletionItem(kh2dev(searchText));
+    const item = new vscode.CompletionItem(
+      HkAndSkt.hk_to_skt(searchText)
+    );
+    item.filterText = searchText;
+    item.preselect = true;
     item.sortText = String(0);
-    console.log(item);
-    items.push(item);
-
-    return items;
+    return [item];
   }
 }
 
