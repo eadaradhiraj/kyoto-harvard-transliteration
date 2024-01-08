@@ -20,8 +20,7 @@
     "type": "git",
     "url": "https://github.com/eadaradhiraj/kyoto-harvard-transliteration"
   },
-  "main": "src/extension",
-  "browser": "dist/web/extension.js",
+  "main": "src/extension.js",
   "contributes": {
     "commands": [
       {
@@ -50,26 +49,9 @@
       ]
     }
   },
-  "scripts": {
-    "test": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/index.js",
-    "pretest": "npm run compile-web",
-    "vscode:prepublish": "npm run package-web",
-    "compile-web": "webpack",
-    "watch-web": "webpack --watch",
-    "package-web": "webpack --mode production --devtool hidden-source-map",
-    "lint": "eslint src",
-    "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ."
-  },
   "devDependencies": {
     "@types/node": "^17.0.15",
     "@types/vscode": "^1.64.0",
-    "@vscode/test-web": "^0.0.50",
-    "eslint": "^8.8.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.25.4",
-    "webpack-cli": "^5.1.4"
-  },
-  "dependencies": {
-    "webpack": "^5.89.0"
+    "eslint": "^8.8.0"
   }
 }
