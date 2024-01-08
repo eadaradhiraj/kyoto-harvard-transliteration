@@ -45,6 +45,7 @@ class HkAndSkt {
       'R': 'ृ',
       'e': 'े',
       'o': 'ो',
+      'au': 'ौ',
       "RR": "ॄ",
   };
 
@@ -150,7 +151,7 @@ class HkAndSkt {
 }
 
 const getSearchText = (lineText, position) => {
-  const matches = lineText.substr(0, position.character).trim().match(/\w*$/);
+  const matches = lineText.substr(0, position.character).trim().match(/[^0-9\s]*$/);
   if (matches) {
     return matches[0];
   }
