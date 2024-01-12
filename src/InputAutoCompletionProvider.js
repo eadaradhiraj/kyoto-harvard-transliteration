@@ -152,10 +152,7 @@ class HkAndSkt {
 
 const getSearchText = (lineText, position) => {
   const matches = lineText.substr(0, position.character).trim().match(/[^0-9\s]*$/);
-  if (matches) {
-    return matches[0];
-  }
-  return '';
+  return matches ?? '';
 };
 
 /**
@@ -166,15 +163,18 @@ class InputAutoCompletionProvider {
   provideCompletionItems(document, position) {
     const lineAt = document.lineAt(position);
     const lineText = document.getText(lineAt.range);
-    const searchText = getSearchText(lineText, position);
+    const match = getSearchText(lineText, position);
     // Add the actual typed text to suggestions list
     const item = new vscode.CompletionItem(
-      HkAndSkt.hk_to_skt(searchText)
+      HkAndSkt.hk_to_skt(match[0])
     );
-    item.filterText = searchText;
+    item.filterText = match[0];
+    // need range from beginning of match (match.index) to cursorPosition
+    item.range = new vscode.Range(position.line, match.index, position.line, position.character);
     item.preselect = true;
     item.sortText = String(0);
-    return [item];
+    // return [item];
+    return  new vscode.CompletionList([item], true);
   }
 }
 
